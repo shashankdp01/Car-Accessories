@@ -18,6 +18,7 @@ function OrderSuccess({ user, onLogout }) {
           onLogout();
           navigate('/');
         }}
+        onProfileClick={() => navigate('/profile')}
       />
 
       <div className="order-success-page">
@@ -55,8 +56,8 @@ function OrderSuccess({ user, onLogout }) {
             <button className="btn-blue" onClick={() => navigate('/products')}>
               Back to Products
             </button>
-            <button className="btn-outline-blue" onClick={() => navigate('/cart')}>
-              View Cart
+            <button className="btn-outline-blue" onClick={() => navigate('/orders')}>
+              View Orders
             </button>
           </div>
         </div>

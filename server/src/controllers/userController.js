@@ -40,6 +40,30 @@ const getUserById = async (req, res) => {
   }
 };
 
+const updateUserProfile = async (req, res) => {
+  try {
+    const { name, phone } = req.body;
+    const user = await User.findById(req.params.userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    const trimmedName = (name || '').trim();
+    if (!trimmedName) {
+      return res.status(400).json({ message: 'Name is required.' });
+    }
+
+    user.name = trimmedName;
+    user.phone = (phone || '').trim();
+    await user.save();
+
+    return res.status(200).json({ message: 'Profile updated successfully.', user: formatUser(user) });
+  } catch (error) {
+    return res.status(500).json({ message: 'Failed to update profile.', error: error.message });
+  }
+};
+
 const addToCart = async (req, res) => {
   try {
     const { product } = req.body;
@@ -170,5 +194,6 @@ module.exports = {
   checkout,
   getUserById,
   removeCartItem,
+  updateUserProfile,
   updateCartItem,
 };

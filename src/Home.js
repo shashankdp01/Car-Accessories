@@ -1,36 +1,64 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
+import { ALL_PRODUCTS } from './productsData';
 
-const CATEGORIES = [
-  { icon: '🚘', name: 'Exterior',        count: '245 items' },
-  { icon: '🪑', name: 'Interior',         count: '312 items' },
-  { icon: '💡', name: 'Lighting',         count: '198 items' },
-  { icon: '🔊', name: 'Audio & Electronics', count: '167 items' },
-  { icon: '🛞', name: 'Wheels & Tyres',   count: '143 items' },
-  { icon: '⚙️', name: 'Performance',      count: '221 items' },
-  { icon: '🧼', name: 'Car Care',         count: '189 items' },
-  { icon: '🔒', name: 'Safety & Security',count: '134 items' },
-];
-
-const FEATURED = [
-  { icon: '💺', name: 'Universal Seat Covers',  cat: 'Interior',    price: '₹1,899' },
-  { icon: '💡', name: 'LED Headlight Bulbs',    cat: 'Lighting',    price: '₹1,499' },
-  { icon: '🔊', name: 'Bluetooth Car Speaker',  cat: 'Audio',       price: '₹1,199' },
-  { icon: '🧼', name: 'Car Wax & Polish Kit',   cat: 'Car Care',    price: '₹599'  },
-];
+const CATEGORY_ICONS = {
+  Exterior: '🚘',
+  Interior: '🪑',
+  Lighting: '💡',
+  'Audio & Electronics': '🔊',
+  'Wheels & Tyres': '🛞',
+  Performance: '⚙️',
+  'Car Care': '🧼',
+  'Safety & Security': '🔒',
+};
 
 function Home({ user, onGuest, onLogout }) {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const goGuest = () => {
     onGuest();
     navigate('/products');
   };
 
+  const handleShopNow = () => {
+    if (user) {
+      navigate('/products');
+      return;
+    }
+
+    navigate('/login');
+  };
+
+  const categories = Object.entries(
+    ALL_PRODUCTS.reduce((acc, product) => {
+      acc[product.cat] = (acc[product.cat] || 0) + 1;
+      return acc;
+    }, {})
+  ).map(([name, count]) => ({
+    name,
+    icon: CATEGORY_ICONS[name] || '🛠️',
+    count: `${count} items`,
+  }));
+
+  const featured = [...ALL_PRODUCTS]
+    .sort((left, right) => right.rating - left.rating || left.price - right.price)
+    .slice(0, 4);
+
+  useEffect(() => {
+    if (!location.hash) return;
+
+    const sectionId = location.hash.replace('#', '');
+    setTimeout(() => {
+      document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 0);
+  }, [location.hash]);
+
   return (
     <div className="home-page">
-      <Navbar user={user} onLogout={onLogout} />
+      <Navbar user={user} onLogout={onLogout} onBrowseAsGuest={goGuest} />
 
       {/* ── Hero ── */}
       <section className="hero">
@@ -51,12 +79,14 @@ function Home({ user, onGuest, onLogout }) {
             </p>
 
             <div className="hero-btns">
-              <button className="btn-blue" onClick={() => navigate('/login')}>
+              <button className="btn-blue" onClick={handleShopNow}>
                 Shop Now →
               </button>
-              <button className="btn-outline-blue" onClick={goGuest}>
-                Browse as Guest
-              </button>
+              {!user ? (
+                <button className="btn-outline-blue" onClick={goGuest}>
+                  Browse as Guest
+                </button>
+              ) : null}
             </div>
 
             <div className="hero-stats">
@@ -105,10 +135,10 @@ function Home({ user, onGuest, onLogout }) {
       <section className="section">
         <div className="section-head">
           <h2 className="section-title">Shop by Category</h2>
-          <a href="/products" className="section-link">View all →</a>
+          <button className="section-link" onClick={() => navigate('/products')}>View all →</button>
         </div>
         <div className="cat-grid">
-          {CATEGORIES.map(cat => (
+          {categories.map(cat => (
             <div
               className="cat-card"
               key={cat.name}
@@ -126,21 +156,21 @@ function Home({ user, onGuest, onLogout }) {
       <section className="section" style={{ paddingTop: 0 }}>
         <div className="section-head">
           <h2 className="section-title">Top Picks This Week</h2>
-          <a href="/products" className="section-link">See all →</a>
+          <button className="section-link" onClick={() => navigate('/products')}>See all →</button>
         </div>
         <div className="product-strip">
-          {FEATURED.map(p => (
+          {featured.map(p => (
             <div className="prod-card" key={p.name}>
-              <div className="prod-img">{p.icon}</div>
+              <div className="prod-img">{p.icon || '🛠️'}</div>
               <div className="prod-body">
                 <div className="prod-name">{p.name}</div>
                 <div className="prod-cat">{p.cat}</div>
                 <div className="prod-footer">
-                  <span className="prod-price">{p.price}</span>
+                  <span className="prod-price">₹{p.price.toLocaleString('en-IN')}</span>
                   <button
                     className="prod-add-btn"
-                    onClick={() => navigate('/login')}
-                    title="Add to cart"
+                    onClick={() => navigate('/products')}
+                    title="View product"
                   >＋</button>
                 </div>
               </div>
@@ -156,7 +186,7 @@ function Home({ user, onGuest, onLogout }) {
             <div className="deals-tag">🔥 Limited Time Offer</div>
             <h2 className="deals-title">Up to <span>40% Off</span><br />on Top Brands</h2>
             <p className="deals-sub">New deals every week. Don't miss out!</p>
-            <button className="btn-deals" onClick={() => navigate('/products')}>
+            <button className="btn-deals" onClick={() => navigate('/deals')}>
               Explore Deals →
             </button>
           </div>
@@ -183,16 +213,24 @@ function Home({ user, onGuest, onLogout }) {
         </div>
       </section>
 
+      <section id="contact" className="about-section" style={{ paddingTop: 0 }}>
+        <div className="about-inner">
+          <h2>Contact Support</h2>
+          <p>Need help with an order, delivery, or product fitment? Our team is ready to assist you.</p>
+          <p>Email: support@autogearpro.in | Phone: +91 1800-123-4567 | Mon-Sat, 9:00 AM - 8:00 PM</p>
+        </div>
+      </section>
+
       {/* ── Footer ── */}
       <footer className="footer">
         <div className="footer-logo">AutoGear<span>Pro</span></div>
         <p className="footer-sub">Your one-stop shop for premium car accessories across India.</p>
         <div className="footer-links">
-          <a href="/">Home</a>
-          <a href="/products">Products</a>
-          <a href="#deals">Deals</a>
-          <a href="#about">About</a>
-          <a href="#contact">Contact</a>
+          <button onClick={() => navigate('/')}>Home</button>
+          <button onClick={() => navigate('/products')}>Products</button>
+          <button onClick={() => navigate('/deals')}>Deals</button>
+          <button onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })}>About</button>
+          <button onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}>Contact</button>
         </div>
         <p className="footer-copy">© 2025 AutoGearPro. All rights reserved.</p>
       </footer>

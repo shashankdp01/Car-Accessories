@@ -2,9 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
 import api from './api';
 import Cart from './Cart';
+import Deals from './Deals';
 import Home from './Home';
 import Login from './Login';
+import Orders from './Orders';
 import OrderSuccess from './OrderSuccess';
+import Profile from './Profile';
 import Products from './Products';
 import './App.css';
 
@@ -88,10 +91,41 @@ function App() {
           }
         />
         <Route
+          path="/deals"
+          element={
+            <Deals
+              user={user}
+              isGuest={isGuest || !user}
+              onLogout={handleLogout}
+              onUserRefresh={handleUserRefresh}
+            />
+          }
+        />
+        <Route
           path="/cart"
           element={
             user ? (
               <Cart user={user} onLogout={handleLogout} onUserRefresh={handleUserRefresh} />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            user ? (
+              <Profile user={user} onLogout={handleLogout} onUserRefresh={handleUserRefresh} />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/orders"
+          element={
+            user ? (
+              <Orders user={user} onLogout={handleLogout} />
             ) : (
               <Navigate to="/login" replace />
             )

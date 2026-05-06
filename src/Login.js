@@ -86,7 +86,7 @@ function Login({ onLogin, onGuest }) {
 
   return (
     <div className="login-page">
-      <Navbar />
+      <Navbar onBrowseAsGuest={handleGuest} />
 
       <div className="login-body">
         <div>

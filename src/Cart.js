@@ -66,6 +66,7 @@ function Cart({ user, onLogout, onUserRefresh }) {
           onLogout();
           navigate('/');
         }}
+        onProfileClick={() => navigate('/profile')}
       />
 
       <div className="cart-page">

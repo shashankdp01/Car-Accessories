@@ -16,12 +16,6 @@ const CATEGORIES = [
   { icon: 'Safe', name: 'Safety & Security' },
 ];
 
-function statusClass(status) {
-  if (status === 'Delivered') return 'order-status status-delivered';
-  if (status === 'In Transit') return 'order-status status-transit';
-  return 'order-status status-processing';
-}
-
 function Products({ user, isGuest, onLogout, onUserRefresh }) {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
@@ -54,8 +48,6 @@ function Products({ user, isGuest, onLogout, onUserRefresh }) {
 
   const cart = user?.cart || [];
   const cartCount = cart.reduce((sum, item) => sum + item.qty, 0);
-  const initials = user ? user.name.split(' ').map((word) => word[0]).join('').toUpperCase() : '';
-  const orders = user?.orders || [];
 
   const addToCart = async (product) => {
     if (!user) {
@@ -88,55 +80,13 @@ function Products({ user, isGuest, onLogout, onUserRefresh }) {
           onLogout();
           navigate('/');
         }}
+        onProfileClick={() => navigate('/profile')}
         searchQuery={search}
         onSearch={setSearch}
       />
 
       <div className="products-layout">
         <aside className="sidebar">
-          <div className="sidebar-card">
-            {user ? (
-              <div className="sidebar-user">
-                <div className="sidebar-avatar">{initials}</div>
-                <div className="sidebar-user-name">{user.name}</div>
-                <div className="sidebar-user-email">{user.email}</div>
-                <span className="sidebar-user-tag">Verified Member</span>
-              </div>
-            ) : (
-              <div className="sidebar-guest">
-                <div className="sidebar-guest-icon">Guest</div>
-                <div className="sidebar-guest-title">Browsing as Guest</div>
-                <p className="sidebar-guest-sub">
-                  Log in to add items to cart, track orders, and save favourites.
-                </p>
-                <button className="btn-sidebar-login" onClick={() => navigate('/login')}>
-                  Log In / Sign Up
-                </button>
-              </div>
-            )}
-          </div>
-
-          {user ? (
-            <div className="sidebar-card">
-              <div className="sidebar-card-head">Order History</div>
-              <div className="order-list">
-                {orders.length ? (
-                  orders.map((order) => (
-                    <div className="order-row" key={order.id}>
-                      <span className="order-id">{order.id}</span>
-                      <span className={statusClass(order.status)}>{order.status}</span>
-                      <span className="order-total">{order.total}</span>
-                    </div>
-                  ))
-                ) : (
-                  <div className="order-row">
-                    <span className="order-id">No orders yet</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          ) : null}
-
           <div className="sidebar-card">
             <div className="sidebar-card-head">Categories</div>
             <div className="cat-filter-list">
