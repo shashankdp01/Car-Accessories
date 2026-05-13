@@ -25,6 +25,8 @@ const orderSchema = new mongoose.Schema(
       default: 'Processing',
     },
     total: { type: String, required: true },
+    address: { type: String, default: 'N/A' },
+    paymentMethod: { type: String, default: 'N/A' },
     placedAt: { type: Date, default: Date.now },
   },
   { _id: false }
@@ -57,6 +59,7 @@ const userSchema = new mongoose.Schema(
       type: [orderSchema],
       default: [],
     },
+    role: { type: String, default: 'user' },
   },
   { timestamps: true }
 );

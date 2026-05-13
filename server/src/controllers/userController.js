@@ -23,6 +23,7 @@ const formatUser = (user) => ({
   phone: user.phone,
   cart: user.cart,
   orders: user.orders,
+  role: user.role,
 });
 
 const getUserById = async (req, res) => {
@@ -149,6 +150,7 @@ const removeCartItem = async (req, res) => {
 
 const checkout = async (req, res) => {
   try {
+    const { address, paymentMethod } = req.body;
     const user = await User.findById(req.params.userId);
 
     if (!user) {
@@ -157,6 +159,14 @@ const checkout = async (req, res) => {
 
     if (!user.cart.length) {
       return res.status(400).json({ message: 'Your cart is empty.' });
+    }
+    
+    if (!address || !address.trim()) {
+      return res.status(400).json({ message: 'Shipping address is required.' });
+    }
+
+    if (!paymentMethod || !paymentMethod.trim()) {
+      return res.status(400).json({ message: 'Payment method is required.' });
     }
 
     const totalAmount = user.cart.reduce((sum, item) => sum + item.price * item.qty, 0);
@@ -172,6 +182,8 @@ const checkout = async (req, res) => {
       })),
       status: 'Processing',
       total: `Rs. ${totalAmount.toLocaleString('en-IN')}`,
+      address: address.trim(),
+      paymentMethod: paymentMethod.trim(),
       placedAt: new Date(),
     };
 

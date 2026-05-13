@@ -63,6 +63,18 @@ function Orders({ user, onLogout }) {
                   <span className="cart-item-meta">Total</span>
                   <span className="cart-item-price">{order.total}</span>
                 </div>
+                {order.address && (
+                  <div className="cart-summary-row" style={{ alignItems: 'flex-start', marginTop: '4px' }}>
+                    <span className="cart-item-meta">Shipping To</span>
+                    <span className="cart-item-meta" style={{ textAlign: 'right', maxWidth: '60%' }}>{order.address}</span>
+                  </div>
+                )}
+                {order.paymentMethod && (
+                  <div className="cart-summary-row" style={{ marginTop: '4px' }}>
+                    <span className="cart-item-meta">Payment Method</span>
+                    <span className="cart-item-meta">{order.paymentMethod}</span>
+                  </div>
+                )}
                 <div className="order-success-details" style={{ margin: '8px 0 0' }}>
                   {(order.items || []).map((item) => (
                     <div key={`${order.id}-${item.productId}`} className="cart-summary-row">

@@ -7,8 +7,6 @@ function Cart({ user, onLogout, onUserRefresh }) {
   const navigate = useNavigate();
   const [message, setMessage] = useState('');
   const [loadingItemId, setLoadingItemId] = useState(null);
-  const [checkoutLoading, setCheckoutLoading] = useState(false);
-
   const cartItems = user?.cart ?? [];
   const cartCount = cartItems.reduce((sum, item) => sum + item.qty, 0);
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
@@ -41,20 +39,6 @@ function Cart({ user, onLogout, onUserRefresh }) {
     }
   };
 
-  const handleCheckout = async () => {
-    setCheckoutLoading(true);
-    setMessage('');
-
-    try {
-      const { data } = await api.post(`/users/${user.id}/checkout`);
-      onUserRefresh(data.user);
-      navigate('/order-success', { state: { order: data.order } });
-    } catch (error) {
-      setMessage(error.response?.data?.message || 'Unable to place the order.');
-    } finally {
-      setCheckoutLoading(false);
-    }
-  };
 
   return (
     <div className="products-page">
@@ -148,8 +132,8 @@ function Cart({ user, onLogout, onUserRefresh }) {
                   <span>Total</span>
                   <span>Rs. {subtotal.toLocaleString('en-IN')}</span>
                 </div>
-                <button className="btn-login" onClick={handleCheckout} disabled={checkoutLoading}>
-                  {checkoutLoading ? 'Placing Order...' : 'Proceed to Buy'}
+                <button className="btn-login" onClick={() => navigate('/checkout')}>
+                  Proceed to Buy
                 </button>
               </div>
             </div>

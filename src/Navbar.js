@@ -43,6 +43,7 @@ function Navbar({
             <li><button className={`nav-link-btn ${pathname === '/products' ? 'active' : ''}`} onClick={() => navigate('/products')}>Products</button></li>
             <li><button className={`nav-link-btn ${pathname === '/deals' ? 'active' : ''}`} onClick={() => navigate('/deals')}>Deals</button></li>
             {user ? <li><button className={`nav-link-btn ${pathname === '/orders' ? 'active' : ''}`} onClick={() => navigate('/orders')}>Orders</button></li> : null}
+            {user && user.role === 'admin' ? <li><button className={`nav-link-btn ${pathname === '/admin' ? 'active' : ''}`} onClick={() => navigate('/admin')} style={{ color: '#dc3545', fontWeight: 'bold' }}>Admin Dashboard</button></li> : null}
             <li><button className="nav-link-btn" onClick={() => navigateToSection('about')}>About</button></li>
           </ul>
         )}

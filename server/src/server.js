@@ -21,8 +21,13 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', message: 'AutoGearPro backend is running.' });
 });
 
+const productRoutes = require('./routes/productRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/admin', adminRoutes);
 
 connectDB()
   .then(() => {

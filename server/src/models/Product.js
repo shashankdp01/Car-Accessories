@@ -7,6 +7,8 @@ const productSchema = new mongoose.Schema(
     cat: { type: String, required: true, trim: true },
     price: { type: Number, required: true, min: 0 },
     icon: { type: String, default: '' },
+    image: { type: String, default: '' },
+    brand: { type: String, default: '' },
     rating: { type: Number, default: 0, min: 0, max: 5 },
     badge: { type: String, default: null },
   },

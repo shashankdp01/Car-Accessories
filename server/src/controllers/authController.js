@@ -22,6 +22,7 @@ const formatUser = (user) => ({
   phone: user.phone,
   cart: user.cart,
   orders: user.orders,
+  role: user.role,
 });
 
 const registerUser = async (req, res) => {
@@ -45,6 +46,7 @@ const registerUser = async (req, res) => {
       phone: phone || '',
       cart: [],
       orders: [],
+      role: email.toLowerCase() === 'admin@example.com' ? 'admin' : 'user',
     });
 
     return res.status(201).json({
@@ -75,6 +77,11 @@ const loginUser = async (req, res) => {
     }
 
     await cleanupLegacyOrders(user);
+
+    if (user.email === 'admin@example.com' && user.role !== 'admin') {
+      user.role = 'admin';
+      await user.save();
+    }
 
     return res.status(200).json({
       message: 'Login successful.',

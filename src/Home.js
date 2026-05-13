@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
-import { ALL_PRODUCTS } from './productsData';
+import api from './api';
 
 const CATEGORY_ICONS = {
   Exterior: '🚘',
@@ -32,8 +32,22 @@ function Home({ user, onGuest, onLogout }) {
     navigate('/login');
   };
 
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const { data } = await api.get('/products');
+        setProducts(data.products);
+      } catch (err) {
+        console.error('Failed to load products in Home', err);
+      }
+    };
+    fetchProducts();
+  }, []);
+
   const categories = Object.entries(
-    ALL_PRODUCTS.reduce((acc, product) => {
+    products.reduce((acc, product) => {
       acc[product.cat] = (acc[product.cat] || 0) + 1;
       return acc;
     }, {})
@@ -43,7 +57,7 @@ function Home({ user, onGuest, onLogout }) {
     count: `${count} items`,
   }));
 
-  const featured = [...ALL_PRODUCTS]
+  const featured = [...products]
     .sort((left, right) => right.rating - left.rating || left.price - right.price)
     .slice(0, 4);
 
@@ -160,11 +174,17 @@ function Home({ user, onGuest, onLogout }) {
         </div>
         <div className="product-strip">
           {featured.map(p => (
-            <div className="prod-card" key={p.name}>
-              <div className="prod-img">{p.icon || '🛠️'}</div>
+            <div className="prod-card" key={p.id || p.name}>
+              <div className="prod-img">
+                {p.image ? (
+                  <img src={p.image} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '10px' }} />
+                ) : (
+                  p.icon || '🛠️'
+                )}
+              </div>
               <div className="prod-body">
                 <div className="prod-name">{p.name}</div>
-                <div className="prod-cat">{p.cat}</div>
+                <div className="prod-cat">{p.cat} {p.brand ? `• ${p.brand}` : ''}</div>
                 <div className="prod-footer">
                   <span className="prod-price">₹{p.price.toLocaleString('en-IN')}</span>
                   <button

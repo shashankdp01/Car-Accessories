@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
 import api from './api';
 import Cart from './Cart';
+import Checkout from './Checkout';
 import Deals from './Deals';
 import Home from './Home';
 import Login from './Login';
@@ -9,6 +10,7 @@ import Orders from './Orders';
 import OrderSuccess from './OrderSuccess';
 import Profile from './Profile';
 import Products from './Products';
+import Admin from './Admin';
 import './App.css';
 
 const STORAGE_KEY = 'autogearpro_user';
@@ -112,6 +114,16 @@ function App() {
           }
         />
         <Route
+          path="/checkout"
+          element={
+            user ? (
+              <Checkout user={user} onLogout={handleLogout} onUserRefresh={handleUserRefresh} />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
           path="/profile"
           element={
             user ? (
@@ -134,6 +146,10 @@ function App() {
         <Route
           path="/order-success"
           element={user ? <OrderSuccess user={user} onLogout={handleLogout} /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/admin"
+          element={user ? <Admin user={user} onLogout={handleLogout} /> : <Navigate to="/login" replace />}
         />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

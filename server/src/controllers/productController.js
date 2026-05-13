@@ -28,7 +28,7 @@ const getProductById = async (req, res) => {
 // Create product
 const createProduct = async (req, res) => {
   try {
-    const { id, name, cat, price, icon, rating, badge } = req.body;
+    const { id, name, cat, price, icon, image, brand, rating, badge } = req.body;
 
     if (!id || !name || !cat || price === undefined) {
       return res.status(400).json({ message: 'ID, name, category, and price are required.' });
@@ -45,6 +45,8 @@ const createProduct = async (req, res) => {
       cat,
       price,
       icon: icon || '',
+      image: image || '',
+      brand: brand || '',
       rating: rating || 0,
       badge: badge || null,
     });
@@ -61,7 +63,7 @@ const createProduct = async (req, res) => {
 // Update product
 const updateProduct = async (req, res) => {
   try {
-    const { name, cat, price, icon, rating, badge } = req.body;
+    const { name, cat, price, icon, image, brand, rating, badge } = req.body;
     const productId = req.params.productId;
 
     if (!name || !cat || price === undefined) {
@@ -77,9 +79,11 @@ const updateProduct = async (req, res) => {
     product.name = name;
     product.cat = cat;
     product.price = price;
-    product.icon = icon || product.icon;
+    product.icon = icon !== undefined ? icon : product.icon;
+    product.image = image !== undefined ? image : product.image;
+    product.brand = brand !== undefined ? brand : product.brand;
     product.rating = rating !== undefined ? rating : product.rating;
-    product.badge = badge || null;
+    product.badge = badge !== undefined ? badge : product.badge;
 
     await product.save();
 

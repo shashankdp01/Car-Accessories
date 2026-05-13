@@ -1,8 +1,7 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import api from './api';
-import { ALL_PRODUCTS } from './productsData';
 
 const CATEGORIES = [
   { icon: 'All', name: 'All Products' },
@@ -23,9 +22,25 @@ function Products({ user, isGuest, onLogout, onUserRefresh }) {
   const [sortBy, setSortBy] = useState('default');
   const [message, setMessage] = useState('');
   const [savingProductId, setSavingProductId] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const { data } = await api.get('/products');
+        setProducts(data.products);
+      } catch (err) {
+        console.error('Failed to fetch products', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   const filtered = useMemo(() => {
-    let list = [...ALL_PRODUCTS];
+    let list = [...products];
 
     if (activeCategory !== 'All Products') {
       list = list.filter((product) => product.cat === activeCategory);
@@ -44,7 +59,7 @@ function Products({ user, isGuest, onLogout, onUserRefresh }) {
     if (sortBy === 'rating') list.sort((left, right) => right.rating - left.rating);
 
     return list;
-  }, [search, activeCategory, sortBy]);
+  }, [search, activeCategory, sortBy, products]);
 
   const cart = user?.cart || [];
   const cartCount = cart.reduce((sum, item) => sum + item.qty, 0);
@@ -174,10 +189,14 @@ function Products({ user, isGuest, onLogout, onUserRefresh }) {
                           {product.badge}
                         </span>
                       ) : null}
-                      {product.icon}
+                      {product.image ? (
+                        <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '10px' }} />
+                      ) : (
+                        product.icon
+                      )}
                     </div>
                     <div className="prod-grid-body">
-                      <div className="prod-grid-cat">{product.cat}</div>
+                      <div className="prod-grid-cat">{product.cat} {product.brand ? `• ${product.brand}` : ''}</div>
                       <div className="prod-grid-name">{product.name}</div>
                       <div className="prod-grid-rating">{product.rating} / 5</div>
                       <div className="prod-grid-footer">
